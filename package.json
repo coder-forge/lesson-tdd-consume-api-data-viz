@@ -1,0 +1,19 @@
+{
+  "name": "tdd-api-consumer-data-viz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/**/*.test.js",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^3.1.2",
+    "nock": "^9.0.2"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6"
+  }
+}
