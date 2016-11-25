@@ -1,19 +1,19 @@
 {
-  "name": "tdd-api-consumer-data-viz",
+  "name": "tutorial-consume-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "### WIP work in progress",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/**/*.test.js",
-    "start": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coder-forge/tutorial-consume-api.git"
   },
   "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "mocha": "^3.1.2",
-    "nock": "^9.0.2"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coder-forge/tutorial-consume-api/issues"
   },
-  "dependencies": {
-    "bluebird": "^3.4.6"
-  }
+  "homepage": "https://github.com/coder-forge/tutorial-consume-api#readme"
 }
