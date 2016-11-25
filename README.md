@@ -2,7 +2,7 @@
 
 ### WIP work in progress
 
-[Part 1](tutorial-consume-api/blob/part-1) - [Part 2](tutorial-consume-api/blob/part-2) - [Part 3](tutorial-consume-api/blob/part-3) - [Part 4](tutorial-consume-api/blob/part-4)
+[Part 1](blob/part-1) - [Part 2](blob/part-2) - [Part 3](blob/part-3) - [Part 4](blob/part-4)
 
 Part 1 - plan & skeleton by tdd.
 
