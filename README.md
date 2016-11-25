@@ -11,7 +11,7 @@ NodeJS - Vanilla ES6
 
 ### Parts
 
-[Part 1](tutorial-consume-api/blob/part-1) - [Part 2](tutorial-consume-api/blob/part-2) - [Part 3](tutorial-consume-api/blob/part-3) - [Part 4](tutorial-consume-api/blob/part-4)
+[Part 1](https://github.com/coder-forge/tutorial-consume-api/tree/part-1) - Part 2 - Part 3 - Part 4
 
 This tutorial will be split into 4 parts, each with its own branch. This current
 branch your on and the final part (part-4) will both contain the code for the
