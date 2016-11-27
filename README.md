@@ -45,3 +45,78 @@ there's a lib folder test/. By the end of this tutorial there will also be a
 bin/ folder, but more on that later.
 
 ### Mocking the remote api
+
+We want these tests to run as quickly as possible. If we're working on code we
+don't want to be waiting 5, 10, 20 mins for tests. For this reason we are
+writing unit tests, testing individual blocks of code as we're developing.
+Waiting for replies from remote API's and rate-limiting, only allowed x amount
+of calls a day/hour, will create problems if we want quick clean tests. To solve
+this we mock out the remote API, in other words we make a fake version.
+
+`nock` is an excellent tool to do this. Given the remote api url, it will listen
+for this call and interupt it, returning what you want. So you could mimic a
+response for a persons details and also error responses to make sure your code
+is handling them efficiently.
+
+In our tests will have to include the modules `nock` and `assert` from the
+`chai` module. Also we will want to include the Consumer class file... so it
+can be tested ;)
+
+The file `test/lib/Consumer.test.js` should now look like:
+```javascript
+"use strict";
+
+const assert = require('chai').assert,
+    nock = require('nock');
+
+const ConsumerClass = require('../../lib/Consumer.js');
+let Consumer;
+
+describe('Consumer Class', ()=>{
+
+    beforeEach(()=>{
+
+        const config = {
+            api_url: 'http://url.to.remote.api',
+            client_id: 'foobar',
+            client_secret: 'bizbaz',
+            app_name: 'test',
+        }
+
+        Consumer = new ConsumerClass(config);
+    })
+
+    it('will authenticate', ()=>{
+
+        const expectedToken = 'wouldthisreallywork';
+
+        nock(config.api_url)
+            .get('/token')
+            .reply(200, {
+                auth_token: expectedToken,
+            });
+
+        return Consumer.authenticate(config)
+            .then((actualToken)=>{
+
+                // test token
+                assert.equal(actualToken, expectedToken);
+            })
+            .catch((err)=>{
+                throw err;
+            });
+    });
+
+    it('will validate token', ()=>{
+
+        return Consumer.isValid(config)
+            .then((valid)=>{
+
+                // test is valid
+            })
+            .catch((err)=>{
+                throw err;
+            });
+    });
+});
+```

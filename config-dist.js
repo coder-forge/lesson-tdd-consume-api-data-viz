@@ -8,6 +8,7 @@
 
 const config = {
 
+    api_url: ""
     client_id: "",
     client_secret: "",
     app_name: "",
