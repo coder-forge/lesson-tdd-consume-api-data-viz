@@ -1,27 +1,11 @@
 {
-  "name": "tutorial-consume-api",
+  "name": "foo",
   "version": "1.0.0",
-  "description": "### WIP work in progress",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/coder-forge/tutorial-consume-api.git"
-  },
   "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/coder-forge/tutorial-consume-api/issues"
-  },
-  "homepage": "https://github.com/coder-forge/tutorial-consume-api#readme",
-  "dependencies": {
-    "bluebird": "^3.4.6"
-  },
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0",
-    "nock": "^9.0.2"
-  }
+  "license": "ISC"
 }
