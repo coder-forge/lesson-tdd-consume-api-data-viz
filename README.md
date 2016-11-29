@@ -96,13 +96,13 @@ request(opts, (err, res, body)=>{
 });
 ```
 
-If there's an error we will `reject` it. A rejection will call `.catch`, but
-more on this later.
+If there's an error we will `reject` it. A rejection will trigger `.catch()`,
+instead of `then()` - but more on this later.
 ```javascript
 if(err) return reject(err);
 ```
 
-Else if no error then we `resolve` the result. This will trigger the `.then()`
+Else if no error then we `resolve()` the result. This will trigger the `.then()`
 callback in our test case above.
 ```javascript
 return resolve(res);
@@ -146,6 +146,7 @@ request(opts, (err, res, body)=>{
 
     return resolve(res);
 });
+```
 
 Now running our tests with `npm test` from the command line will fail the test.
 So found something to error check, the statusCode, execellent. Now to get the
