@@ -19,13 +19,11 @@ describe('Consumer Class', ()=>{
 
     it('will make GET request', ()=>{
 
-        /**
         const expectedBody = [{id:417862,name:'octokit.rb'}];
 
         nock(config.host)
             .get('/orgs/octokit/repos')
             .reply(200, expectedBody);
-        */
 
         return Consumer
             .get({

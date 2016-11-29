@@ -177,3 +177,159 @@ return Consumer
         assert.equal(res.statusCode, 200);
     });
 ```
+
+
+### Mocking the request
+
+We want to be able to run these tests multiple times an hour. Making actual
+requests to the remote API everytime is not feasible. One is the time it will
+take for these tests to run. Another is rate limiting of the remote API, which
+only allows x amount of calls per y amount of time. To solve this we will use
+the `nock` module.
+
+We pass the host of the remote API to nock, along with the endpoint, and nock
+will intercept the call. Stop it going out on the wire, and return only what
+you define it to. In the test case `will make GET request`:
+```javascript
+it('will make GET request', ()=>{
+
+    const expectedBody = [{id:417862,name:'octokit.rb'}];
+
+    nock(config.host)
+        .get('/orgs/octokit/repos')
+        .reply(200, expectedBody);
+
+    return Consumer
+        ...
+});
+```
+
+```javascript
+    const expectedBody = [{id:417862,name:'octokit.rb'}];
+```
+First we are defining a body that our mock of GitHub will return. For our
+purposes here we don't need the rull (massive) response. But if our `get()`
+method were to do any transforming of the data then we would need `expectedBody`
+to equal that.
+
+```javascript
+    nock(config.host)
+        .get('/orgs/octokit/repos')
+        .reply(200, expectedBody);
+```
+Here we are telling nock to intercept calls to `config.host`, which we have
+defined in our `beforeEach()`, that are looking for the endpoint
+`/orgs/octokit/repos`. Nock is then told to reply with status of 200 and the
+`expectedBody`.
+
+Now we test that we get the results we've asked nock to return. Where we have
+the `assert()` for the statusCode, add the following underneath:
+```javascript
+    assert.deepEqual(res.body, expectedBody);
+```
+
+Our `Consumer.test.js` file should now look like:
+```javascript
+"use strict";
+
+const assert = require('chai').assert,
+    nock = require('nock');
+
+const ConsumerClass = require('../../lib/Consumer');
+let Consumer, config;
+
+describe('Consumer Class', ()=>{
+
+    beforeEach(()=>{
+
+        config = {
+            host: 'https://api.github.com'
+        }
+
+        Consumer = new ConsumerClass(config);
+    }); // end beforeEach()
+
+    it('will make GET request', ()=>{
+
+        const expectedBody = [{id:417862,name:'octokit.rb'}];
+
+        nock(config.host)
+            .get('/orgs/octokit/repos')
+            .reply(200, expectedBody);
+
+        return Consumer
+            .get({
+                uri: config.host+'/orgs/octokit/repos',
+            })
+            .then(res => {
+                assert.equal(res.statusCode, 200);
+                assert.deepEqual(res.body, expectedBody);
+            });
+    });
+
+});
+```
+
+The `lib/Consumer.js` file:
+```javascript
+"use strict";
+
+const request = require('request'),
+    Promise = require('bluebird');
+
+/**
+ * Consumer Class.
+ */
+class Consumer{
+
+    /**
+     * Make a get request to resource.
+     * @param {Object} opts Request modules options object.
+     * @return {Promise} Resolves to Request.response object.
+     */
+    get(opts){
+
+        // definite headers needed by API
+        (opts.headers) ?
+            opts.headers['User-Agent'] = 'coder-forge test' :
+            opts.headers = {
+                'User-Agent': 'coder-forge test',
+            };
+        opts.method = 'GET';
+        opts.json = true;
+
+        return new Promise((resolve, reject)=>{
+
+            request(opts, (err, res, body)=>{
+                if(err) return reject(err);
+                if(res.statusCode!=200) return reject({
+                    statusCode: res.statusCode,
+                    body: body,
+                });
+
+                return resolve(res);
+            });
+        });
+    }
+
+}
+
+module.exports = Consumer;
+```
+
+Running `npm test` from the command line should now pass:
+```
+$ npm test
+
+> tutorial-consume-api@1.0.0 test /opt/coder-forge/tutorial-consume-api
+> mocha test/**/*.test.js
+
+
+
+  Consumer Class
+    ✓ will make GET request
+
+
+  1 passing (41ms)
+
+```
