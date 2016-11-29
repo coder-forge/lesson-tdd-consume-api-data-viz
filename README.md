@@ -77,7 +77,7 @@ describe('Consumer Class', ()=>{
     beforeEach(()=>{
 
         const config = {
-            api_url: 'http://url.to.remote.api',
+            host: 'http://url.to.remote.api',
             client_id: 'foobar',
             client_secret: 'bizbaz',
             app_name: 'test',
