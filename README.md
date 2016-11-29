@@ -110,7 +110,6 @@ const config = {
 module.exports = config;
 ```
 
-So the above `config-dist.js` file will export an object with the host param.
 Next we create our config file that will be loaded by our module. Create the
 file `config.js` and enter the following:
 
@@ -146,73 +145,52 @@ or the `.gitgnore` if you are on Windows.)
 ### Create our test suite
 
 There are many ways of writing unit tests but using a framework is always a
-plus. For this tutorial we will be using `mocha`. We will want it installed
-`globally` so use the `-g` switch. To install it run:
+plus. For this tutorial we will be using the `mocha` framework. We will want it
+installed `globally`, which means it can be run from the command line - so use
+the `-g` switch when installing. To install it run:
+
 ```bash
 $ npm install -g mocha
 ```
 
-Now we are going to start with authenticating to the remote API. This usually
-involves returning a token that can be used over `https` (an encrypted
-to the API connection). Create the file `test/lib/Consumer.test.js` and enter:
-```javascript
-"use strict";
-
-describe('Consumer Class', ()=>{
-
-    it('will authenticate', ()=>{
-
-    });
-
-});
+You can test if it installed correctly by running:
+```bash
+$ mocha --version
+2.5.3
 ```
 
-The `describe()` and `it()` functions are part of the `mocha` test suite. We do
-our testing inside the `it()` function, and we can group these in to
-`describe()` functions. This will become more clearer as the file grows.
+If you get an error then its not installed globally. This can be a pain on
+some machines, such as windows. Once you have `mocha installed globally` you
+can continue.
 
-Next we are going to write out how we would call our authentication to the
-remote API. Yes, we haven't created anything yet so this is obviously going to
-fail. Welcome to TDD - write the tests first.
+Now we can start writing some code. In the file `test/lib/Consumer.test.js` we
+will start our test suite by entering the following...
 ```javascript
 "use strict";
 
+const assert = require('chai').assert,
+    nock = require('nock');
+
+const ConsumerClass = require('../../lib/Consumer');
+let Consumer, config;
+
 describe('Consumer Class', ()=>{
 
-    it('will authenticate', ()=>{
+    beforeEach(()=>{
 
-        const config = {
-            client_id: 'foobar',
-            client_secret: 'bizbaz',
-            app_name: 'test',
+        config = {
+            host: 'https://api.github.com'
         }
 
-        return Consumer.authenticate(config)
-            .then((token)=>{
+        Consumer = new ConsumerClass(config);
+    }); // end beforeEach()
 
-                // test token
-            })
-            .catch((err)=>{
-                throw err;
-            })
-    });
+    it('will make GET request ', (done)=>{
+        done();
+    }); // end will make GET request
+
 });
 ```
-
-```javascript
-const config = {
-    client_id: 'foobar',
-    client_secret: 'bizbaz',
-    app_name: 'test',
-}
-```
-We know from reading the specs that authentication will need params from a
-config. As this is a unit test we will use fake config. This means that when we
-do create the `authenticate()` method the config will need to be passed into it.
-By writing our tests first we have decoupled the configuration, this is known as
-dependency injection. For those that know it keeps maintenance of the code base
-very clean. Worth looking up for those that don't and full debate beyond scope
-of this tutorial ;)
 
 ### install dependencies
 
