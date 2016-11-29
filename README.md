@@ -6,117 +6,174 @@
 
 Part 2 - Build it to pass.
 
- - create library/files
- - mocking the remote api
- - getToken
- - isValid
- - getData
+ - Write our first test case
 
-### Create library/files
+### Write our first test case.
 
-Create the following `lib/Consumer.js`, so that your project folder now looks
-like:
-```bash
-├── config-dist.js
-├── config.js
-├── lib
-│   └── Consumer.js
-├── LICENSE.md
-├── node_modules
-├── package.json
-├── README.md
-└── test
-    ├── data
-    │   └── getData.json
-    └── lib
-        └── Consumer.test.js
+Now that we have our files in order its time to write our first test case. There
+will be 2 types of requests that we can use with Github, unauthorised and
+authorised. For public data, such as a list of a user's public repos, we won't
+need any authorisation.
+
+We start with how we'd like our module be called:
+```javascript
+    })// end beforeEach()
+
+    it('will make GET request', ()=>{
+
+        return Consumer
+            .get({
+                uri: config.host+'/orgs/octokit/repos',
+            })
+            .then(res => {
+                console.log(res.statusCode);
+                console.log(res.body);
+            });
+    });// end will make GET request
 ```
-Basically there are many ways to structure a node application. This is my
-preferred way as it allows for easy portability and has become standard on most
-open source repos, eg bitbucket and github.
 
-Config files, such as CI builds, linters etc go at the root. This is messy, I
-hate it, but navigating through a repo on github or bitbucket its easy to see
-what services (stack) an application is using. Very handy.
+Looking at the above I've decided that promises would be best, as we're dealing
+with calls on the wire and thus won't know exactly when a response has returned.
+The call will be `Consumer.get(Object).then(fn)`. The `then()` callback will be
+fired only when there is a result returned from the remote API, and this
+callback will `console.log()` the response body.
 
-The next thing to notice is that test, with the exception of its `data/` folder,
-maps the directories where the code lies. There's a lib folder at the root, so
-there's a lib folder test/. By the end of this tutorial there will also be a
-bin/ folder, but more on that later.
-
-### Mocking the remote api
-
-We want these tests to run as quickly as possible. If we're working on code we
-don't want to be waiting 5, 10, 20 mins for tests. For this reason we are
-writing unit tests, testing individual blocks of code as we're developing.
-Waiting for replies from remote API's and rate-limiting, only allowed x amount
-of calls a day/hour, will create problems if we want quick clean tests. To solve
-this we mock out the remote API, in other words we make a fake version.
-
-`nock` is an excellent tool to do this. Given the remote api url, it will listen
-for this call and interupt it, returning what you want. So you could mimic a
-response for a persons details and also error responses to make sure your code
-is handling them efficiently.
-
-In our tests will have to include the modules `nock` and `assert` from the
-`chai` module. Also we will want to include the Consumer class file... so it
-can be tested ;)
-
-The file `test/lib/Consumer.test.js` should now look like:
+So we can now edit our `Consumer` class to match our test case. Edit the file
+`lib/Consumer.js` adding in the methods we think we'll need:
 ```javascript
 "use strict";
 
-const assert = require('chai').assert,
-    nock = require('nock');
+const request = require('request'),
+    Promise = require('bluebird');
 
-const ConsumerClass = require('../../lib/Consumer.js');
-let Consumer;
+/**
+ * Consumer Class.
+ */
+class Consumer{
 
-describe('Consumer Class', ()=>{
+    /**
+     * Make a get request to resource.
+     * @param {Object} opts Request modules options object.
+     * @return {Promise} Resolves to Request.response object.
+     */
+    get(opts){
 
-    beforeEach(()=>{
+        return new Promise((resolve, reject)=>{
 
-        const config = {
-            host: 'http://url.to.remote.api',
-            client_id: 'foobar',
-            client_secret: 'bizbaz',
-            app_name: 'test',
-        }
+            request(opts, (err, res, body)=>{
+                if(err) return reject(err);
 
-        Consumer = new ConsumerClass(config);
-    })
-
-    it('will authenticate', ()=>{
-
-        const expectedToken = 'wouldthisreallywork';
-
-        nock(config.api_url)
-            .get('/token')
-            .reply(200, {
-                auth_token: expectedToken,
+                return resolve(res);
             });
+        });
+    }
 
-        return Consumer.authenticate(config)
-            .then((actualToken)=>{
+}
 
-                // test token
-                assert.equal(actualToken, expectedToken);
-            })
-            .catch((err)=>{
-                throw err;
-            });
-    });
+module.exports = Consumer;
+```
 
-    it('will validate token', ()=>{
+We know we are going to make a network call, so we'll require the `request`
+module, and we know we are going to use promises, so we'll require the
+`bluebird` module.
+```javascript
+const request = require('request'),
+    Promise = require('bluebird');
+```
 
-        return Consumer.isValid(config)
-            .then((valid)=>{
-
-                // test is valid
-            })
-            .catch((err)=>{
-                throw err;
-            });
-    });
+Next we'll create our class with one `get()` method. This method will take
+an Object `options` and return a Promise object with the line:
+```javascript
+return new Promise((resolve, reject)=>{
+    ...
 });
+```
+
+It is inside this promise that we make our request:
+```javascript
+request(opts, (err, res, body)=>{
+    ...
+});
+```
+
+If there's an error we will `reject` it. A rejection will call `.catch`, but
+more on this later.
+```javascript
+if(err) return reject(err);
+```
+
+Else if no error then we `resolve` the result. This will trigger the `.then()`
+callback in our test case above.
+```javascript
+return resolve(res);
+```
+
+We can now test the above by running the following on the command line:
+```bash
+$ npm test
+```
+
+Wo, whats this. Running the tests produces:
+
+```bash
+Consumer Class
+statusCode: 403
+body: Request forbidden by administrative rules. Please make sure your request has a User-Agent header (http://developer.github.com/v3/#user-agent-required). Check https://developer.github.com for other possible causes.
+
+  will make GET request (600ms)
+```
+
+The `res.statusCode` is 403. This is a HTTP Verb that reports the status of the
+process. 400's mean there was something wrong on our side, authentication,
+resource not found. 500's mean there was something wrong on their end, a bug,
+a timeout etc. 200's are what we want for success. 201 means something was
+updated and 200 means resource returned successfully.
+
+Our tests are passing. We know by the `✓` beside the test case name `will make
+GET request (600ms)`. As we got an error we want then to fail. Then we'll fix
+the error of the missing `User-Agent` header.
+
+We need to `reject()` some error info if the server doesn't return 200. In the
+same method, `get()`, under the line checking existence of error `if(err) return
+ reject(err)` we add the line:
+```javascript
+request(opts, (err, res, body)=>{
+    if(err) return reject(err);
+    if(res.statusCode!=200) return reject({ // if not 200
+        statusCode: res.statusCode,
+        body: body,
+    });// end if not 200
+
+    return resolve(res);
+});
+
+Now running our tests with `npm test` from the command line will fail the test.
+So found something to error check, the statusCode, execellent. Now to get the
+test to pass. Add the following to the top of the `get()` method in Consumer.js:
+```javascript
+get(opts){
+
+    // definite headers needed by API
+    (opts.headers) ?
+        opts.headers['User-Agent'] = 'coder-forge test' :
+        opts.headers = {
+            'User-Agent': 'coder-forge test',
+        };
+    ...
+}
+```
+
+If the headers don't exist, then create them. If they do then add the User-Agent
+which alyways has to be 'coder-forge test'. The next piece of the puzzle is to
+test the results in a programatic manner. For this we will use the assert
+module. In the `.then()` callback in our test case, replace the console.log()
+with `assert.equal(res.statusCode, 200)`.
+```javascript
+return Consumer
+    .get({
+        uri: config.host+'/orgs/octokit/repos',
+    })
+    .then(res => {
+        assert.equal(res.statusCode, 200);
+    });
 ```
