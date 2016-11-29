@@ -66,7 +66,7 @@ class Consumer{
                 return resolve(res);
             });
         });
-    }
+    } // end get()
 
 }
 
@@ -161,7 +161,7 @@ get(opts){
             'User-Agent': 'coder-forge test',
         };
     ...
-}
+} // end get()
 ```
 
 If the headers don't exist, then create them. If they do then add the User-Agent
@@ -202,7 +202,7 @@ it('will make GET request', ()=>{
 
     return Consumer
         ...
-});
+}); // end will make GET request
 ```
 
 ```javascript
@@ -266,7 +266,7 @@ describe('Consumer Class', ()=>{
                 assert.equal(res.statusCode, 200);
                 assert.deepEqual(res.body, expectedBody);
             });
-    });
+    }); // end will make GET request
 
 });
 ```
@@ -311,7 +311,7 @@ class Consumer{
                 return resolve(res);
             });
         });
-    }
+    } // end get
 
 }
 

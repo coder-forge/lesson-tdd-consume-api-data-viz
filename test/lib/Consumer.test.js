@@ -33,6 +33,6 @@ describe('Consumer Class', ()=>{
                 assert.equal(res.statusCode, 200);
                 assert.deepEqual(res.body, expectedBody);
             });
-    });
+    }); // end will make GET request
 
 });
