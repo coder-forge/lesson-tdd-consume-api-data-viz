@@ -58,7 +58,7 @@ starting with `.` are hidden, so you may not see it.
 
 ##### creating our module and test files
 
-Next we are going to create our main file and a test file for it. Generally its
+Next we are going to create some files and their test files. Generally its
 a good idea for some standard when placing core files and the `lib/`, short for
 library, seems to be the standard with `nodejs`. Create the empty file
 `lib/Consumer.js`.
@@ -66,7 +66,7 @@ library, seems to be the standard with `nodejs`. Create the empty file
 Its also generally a good idea to organise your code that tests your module. A
 `tests/` directory suits perfectly. The standard with most testing frameworks is
 to mimic the directory structure of your code in the `tests/` folder. So create
-the file `tests/lib/Consumer.test.js` and also the file `tests/config.js`.
+the file `tests/lib/Consumer.test.js`. We will work on these part 2.
 
 So...
   - `lib/Consumer.js` - our code for consuming the remove API
@@ -75,7 +75,7 @@ So...
 ##### creating configuration files
 
 Next we will create a configuration file. We don't want these configuration
-settings to pushed to a git repo yet, at the same time we do want to show a
+settings to pushed to a git repo, ever, yet at the same time we do want to show a
 sample configuration for users to work from. To solve this will involve creating
 the following 3 files in our project root:
 `.gitignore`,`config-dist.js`,`config.js`
@@ -199,7 +199,7 @@ const assert = require('chai').assert;
 ```
 
 Here are are requiring the libraries that we will be using. We will use the
-assert object from the `chai` module.
+assert tool from the `chai` module.
 
 The next block:
 ```javascript
@@ -250,7 +250,8 @@ do this we will get the first level properties of both files and assert that
 they are the same. The below test will suit our purposes but if our config
 objects were more than one level we would need something slightly more complex.
 
-So in our test file for configuration we will enter the following:
+So in our test file for configuration (`tests/config.test.js`) we will enter the
+following:
 ```javascript
 ...
     it('config and config-dist properties match', (done)=>{
