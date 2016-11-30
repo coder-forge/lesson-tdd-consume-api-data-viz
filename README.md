@@ -1,4 +1,4 @@
-# tutorial-consume-api - Part 1
+# tutorial-consume-api - Part 2
 
 ### WIP work in progress
 
@@ -10,14 +10,34 @@ Part 2 - Build it to pass.
 
 ### Write our first test case.
 
-Now that we have our files in order its time to write our first test case. There
-will be 2 types of requests that we can use with Github, unauthorised and
-authorised. For public data, such as a list of a user's public repos, we won't
-need any authorisation.
+Now that our project is initiated, we have configuration that is testable and
+some empty files where we will put our code. Before we put anything into our
+`Consumer.js` file, we will write the tests first. Yep... write the tests first.
 
-We start with how we'd like our module be called:
+In `tests/lib/Consumer.js` we will add a test case for making a GET request to
+the github API that will return some public repo's for a user. This is a good
+starting point for this tutorial as we won't need to authenticate with github
+first.
+
+Add the following to the `tests/lib/Consumer.test.js` file:
 ```javascript
-    })// end beforeEach()
+"use strict";
+
+const assert = require('chai').assert;
+
+const ConsumerClass = require('../../lib/Consumer');
+let Consumer, config;
+
+describe('Consumer Class', ()=>{
+
+    beforeEach(()=>{
+
+        config = {
+            host: 'https://api.github.com'
+        }
+
+        Consumer = new ConsumerClass(config);
+    }); // end beforeEach()
 
     it('will make GET request', ()=>{
 
@@ -26,11 +46,57 @@ We start with how we'd like our module be called:
                 uri: config.host+'/orgs/octokit/repos',
             })
             .then(res => {
-                console.log(res.statusCode);
-                console.log(res.body);
+                assert.equal(res.statusCode, 200);
             });
-    });// end will make GET request
+    }); // end will make GET request
+
+});
 ```
+
+The first block:
+```javascript
+const assert = require('chai').assert;
+
+const ConsumerClass = require('../../lib/Consumer');
+let Consumer, config;
+```
+
+Here we are loading the assert tool, our Consumer class and declaring 2 global
+variables: `Consumer` and `config`.
+
+The `beforeEach()`:
+```javascript
+beforeEach(()=>{
+
+    config = {
+        host: 'https://api.github.com'
+    }
+
+    Consumer = new ConsumerClass(config);
+}); // end beforeEach()
+```
+
+This helper function from `mocha` will run before every unit test. It is
+important that we are testing a clean instance of `Consumer`. That is why we
+will construct our Consumer class in our global `Consumer` variable declared at
+the top of the file.
+
+Our test case:
+```javascript
+it('will make GET request', ()=>{
+
+    return Consumer
+        .get({
+            uri: config.host+'/orgs/octokit/repos',
+        })
+        .then(res => {
+            assert.equal(res.statusCode, 200);
+        });
+}); // end will make GET request
+```
+
+There is no code for the 
+
 
 Looking at the above I've decided that promises would be best, as we're dealing
 with calls on the wire and thus won't know exactly when a response has returned.
