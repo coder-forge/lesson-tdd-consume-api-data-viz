@@ -269,4 +269,6 @@ test both properties are the same. Running `mocha tests/**/*.test.js` will
 pass, so try adding a property to one of the config files, "accidentaly", and
 run mocha again. You see, it fails ;)
 
-In part two we will start testing the `Consumer.js` class.
+In [Part 2](https://github.com/coder-forge/tutorial-consume-api/tree/part-2) we will start testing the `Consumer.js` class.
+
+[Next =>](https://github.com/coder-forge/tutorial-consume-api/tree/part-2)
